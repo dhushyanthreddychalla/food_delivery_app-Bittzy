@@ -1,0 +1,48 @@
+.loginWrap{
+  width:min(1100px,92%);
+  margin:26px auto 40px;
+  display:grid;
+  place-items:center;
+  min-height:calc(100vh - 120px);
+}
+
+.loginCard{
+  width:min(520px, 100%);
+  padding:32px;
+  background: #ffffff;
+  border-radius: 20px;
+  box-shadow: 0 8px 24px rgba(0,0,0,.06);
+  border: 1px solid rgba(0,0,0,.08);
+}
+
+.form{margin-top:14px; display:grid; gap:12px}
+.field span{display:block; font-size:13px; color:rgba(0,0,0,.70); margin-bottom:6px}
+.field input{
+  width:100%;
+  padding:12px 14px;
+  border-radius:14px;
+  border:1px solid rgba(0,0,0,.15);
+  outline:none;
+  background:#f9f9f9;
+  transition:.2s;
+  font-size:14px;
+}
+.field input:focus{
+  transform:translateY(-1px);
+  background:#fff;
+  border-color: #fc8019;
+  box-shadow: 0 4px 12px rgba(252,128,25,.15);
+}
+.btnPrimary{
+  width: 100%;
+  margin-top: 10px;
+  justify-content: center;
+  background: #fc8019;
+  color: #fff;
+  border: none;
+}
+.btnPrimary:hover{
+  background: #e06b12;
+  box-shadow: 0 4px 12px rgba(252,128,25,.3);
+}
+.passRow{display:flex; gap:10px; align-items:center}

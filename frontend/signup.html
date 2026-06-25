@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Signup • Food Delivery</title>
+  <link rel="stylesheet" href="./css/theme.css"/>
+  <link rel="stylesheet" href="./css/common.css"/>
+  <link rel="stylesheet" href="./css/login.css"/> <!-- Reuse login styles for consistency -->
+</head>
+<body class="page-in">
+  <div id="scrollProgress"></div>
+  <div class="mesh-bg"></div>
+
+  <!-- Floating Food Icons -->
+  <div id="floatingIcons"></div>
+
+  <header class="topbar stagger-in">
+    <div class="brand">
+      <div class="logo">🍔</div>
+      <div>
+        <div class="brandTitle">Food Delivery</div>
+        <div class="brandSub">Premium UI • Fast • Fresh</div>
+      </div>
+    </div>
+    <div class="navRight">
+      <a class="pill" href="index.html">🏠 Home</a>
+      <a class="pill" href="login.html">🔑 Login</a>
+    </div>
+  </header>
+
+  <main class="split-wrap">
+    <!-- Image Side (Flipped for variety or kept same for brand) -->
+    <div class="split-side image-side" style="clip-path: polygon(0 0, 85% 0, 100% 100%, 0% 100%);">
+      <div style="text-align: center; color: white; padding: 40px; z-index: 2;">
+        <h1 style="font-size: 48px; font-weight: 1000; margin-bottom: 20px;">Join the Flavor Club 🍩</h1>
+        <p style="font-size: 18px; font-weight: 700; opacity: 0.9;">Sign up for exclusive deals and lightning fast delivery.</p>
+      </div>
+      <div style="position: absolute; font-size: 80px; top: 15%; left: 10%; opacity: 0.2;">🌭</div>
+      <div style="position: absolute; font-size: 60px; bottom: 20%; right: 15%; opacity: 0.2;">🍕</div>
+      <div style="position: absolute; font-size: 100px; top: 50%; right: 10%; transform: translateY(-50%); opacity: 0.1;">🥯</div>
+    </div>
+
+    <!-- Form Side -->
+    <div class="split-side">
+      <section class="glass-card-entry" style="width: min(480px, 90%); padding: 48px;">
+        <h1 style="font-size: 32px; font-weight: 1000; margin-bottom: 8px;">Create Account ✨</h1>
+        <p style="color: var(--muted); font-weight: 700; margin-bottom: 32px;">Start your delicious journey today.</p>
+
+        <form id="signupForm" class="form">
+          <div class="form-group-premium">
+            <input id="email" class="input-premium" type="email" placeholder=" " required>
+            <label class="label-premium">Email Address</label>
+          </div>
+
+          <div class="form-group-premium">
+            <input id="pass" class="input-premium" type="password" placeholder=" " required>
+            <label class="label-premium">Choose Password</label>
+          </div>
+
+          <button class="btn-premium" id="signupBtn" type="submit" style="width: 100%; margin-top: 12px;">Create Account →</button>
+
+          <div style="text-align: center; margin-top: 24px;">
+            <p style="font-size: 14px; font-weight: 700; color: var(--muted);">
+              Already have an account? <a href="login.html" style="color: var(--orange); text-decoration: none;">Log in here</a>
+            </p>
+          </div>
+
+          <div style="margin-top: 32px; padding: 16px; background: rgba(0,0,0,0.03); border-radius: 12px; font-size: 11px; font-weight: 800; color: var(--muted); text-align: center;">
+            Demo signup: account data will be stored in your browser.
+          </div>
+        </form>
+      </section>
+    </div>
+  </main>
+
+  <script src="./js/theme.js"></script>
+  <script src="./js/auth.js"></script>
+  <script src="./js/ui.js"></script>
+  <script src="./js/signup.js"></script>
+  <script>
+    // Dynamic Floating Icons
+    const icons = ['🍕', '🍔', '🍟', '🍩', '🥤', '🍰', '🌮', '🍦', '🍣', '🥨'];
+    const container = document.getElementById('floatingIcons');
+
+    for (let i = 0; i < 15; i++) {
+      const el = document.createElement('div');
+      el.className = 'floating-food';
+      el.textContent = icons[Math.floor(Math.random() * icons.length)];
+      el.style.left = Math.random() * 100 + 'vw';
+      el.style.top = Math.random() * 100 + 'vh';
+      el.style.fontSize = (20 + Math.random() * 30) + 'px';
+      el.style.animation = `floatAround ${10 + Math.random() * 20}s linear infinite`;
+      el.style.animationDelay = `-${Math.random() * 20}s`;
+      container.appendChild(el);
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Cart • Food Delivery</title>
+  <link rel="stylesheet" href="./css/cart.css"/>
+  <script src="./js/theme.js"></script>
+</head>
+<body>
+  <div id="scrollProgress"></div>
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo">🛒</div>
+      <div>
+        <div class="brandTitle">Your Cart</div>
+        <div class="brandSub">Coupons • Checkout • Smooth</div>
+      </div>
+    </div>
+
+    <nav class="navRight">
+      <button class="pill" id="themeToggle" type="button" onclick="window.toggleGlobalTheme(event)">🌙 Dark</button>
+      <div id="userBadge" class="userBadge">👤 Guest</div>
+      <a class="btn ghost" href="home.html">🏠 Home</a>
+      <a class="btn ghost" href="menu.html">🍽️ Menu</a>
+      <a class="btn ghost active" href="cart.html">🛒 Cart <span id="cartCount" class="count cart-badge">0</span></a>
+      <button class="btn danger" id="logoutBtn" type="button">Logout</button>
+    </nav>
+  </header>
+
+  <main class="wrap">
+    <div class="headRow">
+      <div>
+        <h1>Items</h1>
+        <p class="muted">Add / remove items with smooth animations</p>
+      </div>
+
+      <div class="couponRow">
+        <div class="couponBox">
+          <span class="pill">🏷️ Coupon</span>
+          <input id="coupon" placeholder="Try FIRST30 (min ₹200)" />
+        </div>
+        <button id="applyCoupon" class="btnApply" type="button">Apply</button>
+      </div>
+      <div class="available-coupons" style="margin-top:12px; display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+        <span style="font-size:12px; font-weight:bold; color:var(--muted);">Available:</span>
+        <span class="couponTag" data-code="FIRST30" style="font-size:11px; font-weight:800; padding:6px 12px; border-radius:8px; border:1px dashed var(--accent); color:var(--accent); cursor:pointer; background:rgba(255,122,24,0.05); transition:transform 0.2s">FIRST30 (30% Off)</span>
+        <span class="couponTag" data-code="WELCOME50" style="font-size:11px; font-weight:800; padding:6px 12px; border-radius:8px; border:1px dashed var(--accent); color:var(--accent); cursor:pointer; background:rgba(255,122,24,0.05); transition:transform 0.2s">WELCOME50 (50% Off)</span>
+      </div>
+    </div>
+
+    <section class="grid">
+      <!-- LEFT: items -->
+      <div class="card">
+        <div class="cardHead">
+          <h3>Cart Items</h3>
+          <span class="mini" id="itemsMini">0 items</span>
+        </div>
+        <div id="cartList" class="cartList"></div>
+      </div>
+
+      <!-- RIGHT: bill -->
+      <aside class="card sticky">
+        <div class="cardHead">
+          <h3>Bill Summary</h3>
+          <span class="mini">🧾</span>
+        </div>
+
+        <div class="bill">
+          <div class="line"><span>Subtotal</span><b id="sub">₹0</b></div>
+          <div class="line"><span>Discount</span><b id="disc">-₹0</b></div>
+          <div class="hr"></div>
+          <div class="line big"><span>Total</span><b id="tot">₹0</b></div>
+
+          <p id="msg" class="msg"></p>
+
+          <button id="goCheckout" class="cta" type="button">Checkout</button>
+          <button id="clearCart" class="ghostBtn" type="button">Clear Cart</button>
+
+          <!-- Split Bill Calc -->
+          <button id="splitBillBtn" class="ghostBtn" style="margin-top:10px; color:#6c63ff;" type="button">✂️ Split Bill Calculator</button>
+          <div id="splitUI" style="display:none; margin-top:15px; background:rgba(0,0,0,0.03); padding:16px; border-radius:16px; border:1px solid rgba(0,0,0,0.05); text-align:left; animation:pop 0.3s ease;">
+             <div style="font-weight:900; font-size:14px; margin-bottom:12px;">How many people?</div>
+             <div style="display:flex; gap:15px; align-items:center;">
+                 <button id="splitDec" style="width:40px; height:40px; border-radius:12px; border:none; background:white; font-weight:1000; font-size:20px; cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,0.05);">-</button>
+                 <span id="splitCount" style="font-weight:1000; font-size:22px; width:24px; text-align:center;">2</span>
+                 <button id="splitInc" style="width:40px; height:40px; border-radius:12px; border:none; background:white; font-weight:1000; font-size:20px; cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,0.05);">+</button>
+             </div>
+             <div style="height:1px; background:rgba(0,0,0,0.05); margin:15px 0;"></div>
+             <div style="display:flex; justify-content:space-between; align-items:center;">
+                 <span style="font-size:13px; color:var(--muted); font-weight:800;">Amount Per Person</span>
+                 <span id="splitAmt" style="font-weight:1000; font-size:22px; color:#6c63ff;">₹0.00</span>
+             </div>
+          </div>
+
+          <!-- Green Delivery Toggle -->
+          <div id="greenDeliveryBox" style="margin-top:20px; padding:16px; border-radius:18px; background:linear-gradient(135deg, rgba(34,197,94,0.1), rgba(34,197,94,0.05)); border:1px solid rgba(34,197,94,0.2); display:flex; align-items:center; gap:12px; transition:all 0.3s ease;">
+             <div id="earthIcon" style="font-size:24px; transition:transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);">🌍</div>
+             <div style="flex:1;">
+                 <div style="font-weight:1000; font-size:14px; color:#15803d;">Green Delivery</div>
+                 <div style="font-size:11px; color:rgba(21,128,61,0.8); font-weight:800;">Opt-out of plastic cutlery & save the Earth!</div>
+             </div>
+             <label class="switch">
+                 <input type="checkbox" id="greenToggle">
+                 <span class="slider round"></span>
+             </label>
+          </div>
+
+          <div class="trust">
+            <div class="trustPill">🚚 Fast Delivery</div>
+            <div class="trustPill">✅ Verified</div>
+            <div class="trustPill">🔒 Secure</div>
+          </div>
+
+          <p class="note">Checkout click chesinapudu Address + Payment page open avtundi.</p>
+        </div>
+      </aside>
+    </section>
+  </main>
+
+  <div id="toast" class="toast"></div>
+
+  <script src="./js/auth.js"></script>
+  <script src="./js/ui.js"></script>
+  <script src="./js/cart.js"></script>
+</body>
+</html>

@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Order Placed • Food Delivery Premium</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&display=swap" rel="stylesheet">
+  
+  <script src="./js/theme.js"></script>
+  <link rel="stylesheet" href="./css/common.css"/>
+  <link rel="stylesheet" href="./css/success.css"/>
+</head>
+
+<body class="success-page">
+  <canvas id="confetti"></canvas>
+  <div class="mesh-bg"></div>
+
+  <div class="wrap">
+    <!-- Header -->
+    <header class="top">
+      <div class="brand">
+        <div class="logo-icon">FD</div>
+        <div>
+          <div style="font-weight:1000; font-size:18px; line-height:1;">Food Delivery</div>
+          <div style="color:#64748b; font-weight:700; font-size:12px; margin-top:2px;">Premium Order Experience</div>
+        </div>
+      </div>
+      <div class="badge">
+        <span>🕒</span>
+        <span id="eta">ETA: calculating...</span>
+      </div>
+    </header>
+
+    <div class="grid">
+      <!-- MAIN TRACKING COLUMN -->
+      <main>
+        <div class="card">
+          <div class="hero">
+            <div class="tick-container">
+              <svg class="tick-svg" viewBox="0 0 100 100">
+                <path d="M20 50 L40 70 L80 30" />
+              </svg>
+            </div>
+            <div>
+              <h1>Order Placed! 🎉</h1>
+              <p id="heroLine">Hang tight, we're getting it ready.</p>
+            </div>
+          </div>
+
+          <!-- Tracking UI -->
+          <div class="trackWrap">
+            <div style="display:flex; justify-content:space-between; align-items:flex-end;">
+              <div>
+                <b style="font-size:18px;" id="statusText">Preparing</b>
+                <div id="statusSub" style="color:#64748b; font-weight:700; font-size:13px; margin-top:4px;">We started cooking your items</div>
+              </div>
+              <div class="pill" style="background:rgba(252,128,25,0.1); color:#fc8019; border:none; font-weight:1000;">Live Updates</div>
+            </div>
+
+            <!-- SVG MAP DASH -->
+            <div class="delivery-dash">
+              <svg class="dash-svg" viewBox="0 0 400 150">
+                <path id="mainPath" class="dash-path" d="M30 75 Q100 20 200 75 T350 75" />
+                <path id="progressPath" class="dash-progress" d="M30 75 Q100 20 200 75 T350 75" />
+                <text x="20" y="105" style="font-size:24px;">🏪</text>
+                <text x="180" y="130" style="font-size:24px;">🌳</text>
+                <text x="340" y="105" style="font-size:24px;">🏠</text>
+                <g id="riderGroup" class="bike-icon">
+                  <text y="5" x="-10" style="font-size:28px;">🛵</text>
+                  <rect y="10" x="-16" width="32" height="14" rx="7" fill="#1e293b" />
+                  <text y="20" x="-12" style="font-size:8px; fill:white; font-weight:1000;">RIDER</text>
+                </g>
+              </svg>
+            </div>
+
+            <div class="steps">
+                <div class="step done" data-step="1">
+                    <div class="t"><span class="dot">✓</span> Placed</div>
+                    <div class="d">Order received</div>
+                </div>
+                <div class="step active" data-step="2">
+                    <div class="t"><span class="dot">2</span> Kitchen</div>
+                    <div class="d">Chef is cooking</div>
+                </div>
+                <div class="step" data-step="3">
+                    <div class="t"><span class="dot">3</span> On Way</div>
+                    <div class="d">Rider picked up</div>
+                </div>
+                <div class="step" data-step="4">
+                    <div class="t"><span class="dot">4</span> Enjoy</div>
+                    <div class="d">Delivered</div>
+                </div>
+            </div>
+          </div>
+
+          <!-- Rider Info Card (NEW) -->
+          <div class="rider-card">
+            <img src="https://images.unsplash.com/photo-1599566150163-29194dcaad36?w=100&q=80" alt="Rider" class="rider-img">
+            <div class="rider-info">
+              <div class="rider-name">Rahul Sharma</div>
+              <div class="rider-rank"> ⭐ 4.9 Super Rider</div>
+              <div style="font-size:11px; opacity:0.7; margin-top:4px;">Driving Honda Activa • KA-01-EF-4242</div>
+            </div>
+            <div class="rider-actions">
+              <div class="action-btn" onclick="window.toast('Calling Rahul Sharma... 📞', 'info')">📞</div>
+              <div class="action-btn" onclick="window.openRiderChat()">💬</div>
+            </div>
+          </div>
+
+          <!-- Emoji Rating (NEW) -->
+          <div class="rating-section" id="ratingSection" style="display:none;">
+            <div class="rating-title">How was your order experience?</div>
+            <div class="emoji-row">
+                <button class="emoji-btn" onclick="rate('Angry', this)">😡</button>
+                <button class="emoji-btn" onclick="rate('Neutral', this)">😐</button>
+                <button class="emoji-btn" onclick="rate('Happy', this)">😊</button>
+                <button class="emoji-btn" onclick="rate('Love', this)">😍</button>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <!-- SIDEBAR COLUMN -->
+      <aside>
+        <div class="card delay">
+          <div style="display:flex; justify-content:space-between; margin-bottom:20px;">
+            <b style="font-size:18px;">Order Details</b>
+            <span style="font-size:12px; color:#64748b; font-weight:800;">Receipt #<span id="orderId">...</span></span>
+          </div>
+
+          <div class="kv-grid">
+            <div class="kv-row">
+                <span class="kv-label">Payment Mode</span>
+                <span class="kv-value" id="payment">...</span>
+            </div>
+            <div class="kv-row">
+                <span class="kv-label">Total Items</span>
+                <span class="kv-value" id="itemsCount">...</span>
+            </div>
+            <div class="kv-row">
+                <span class="kv-label">Total Amount</span>
+                <span class="kv-value" id="total" style="color:#fc8019;">...</span>
+            </div>
+          </div>
+
+          <div style="margin-top:24px;">
+            <b style="font-size:14px;">Delivery Address</b>
+            <p id="caddr" style="margin-top:8px; color:#64748b; font-size:13px; font-weight:700; line-height:1.5;">...</p>
+          </div>
+
+          <div class="btnRow">
+            <a href="menu.html" class="btn btn-primary">Order More</a>
+            <a href="home.html" class="btn btn-secondary">Home</a>
+          </div>
+
+          <button id="themeToggle" class="btn btn-secondary" style="width:100%; margin-top:12px; font-size:13px;">🌙 Dark</button>
+          <button onclick="window.downloadReceipt()" class="btn btn-secondary" style="width:100%; margin-top:12px; font-size:13px; background:rgba(16,185,129,0.1); color:#10b981; border-color:rgba(16,185,129,0.2);">📄 Download Receipt</button>
+          
+          <p style="text-align:center; font-size:11px; color:#94a3b8; font-weight:800; margin-top:20px;">
+            Thank you for choosing Food Delivery Premium.<br/>Your safety is our priority.
+          </p>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <!-- Rider Chat Modal -->
+  <div class="modal-overlay" id="chatModal">
+    <div class="modal-content">
+      <div class="chat-header">
+        <img src="https://images.unsplash.com/photo-1599566150163-29194dcaad36?w=100&q=80" alt="Rider">
+        <div style="flex:1">
+          <div style="font-weight:1000; font-size:16px;">Rahul Sharma</div>
+          <div style="font-size:11px; opacity:0.7; font-weight:800;">Online • Super Rider</div>
+        </div>
+        <button onclick="window.closeRiderChat()" style="background:none; border:none; color:white; cursor:pointer; font-size:20px;">✕</button>
+      </div>
+      <div class="chat-body" id="chatBody">
+        <div class="msg rider">Hi! I'm on my way to pick up your order. 🛵</div>
+      </div>
+      <div class="chat-footer">
+        <input type="text" class="chat-input" id="chatInput" placeholder="Type a message...">
+        <button class="send-btn" onclick="window.sendUserMsg()">➔</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Milestone Popup -->
+  <div class="milestone-popup" id="milestonePopup">
+    <span class="m-icon" id="milestoneIcon">📍</span>
+    <span id="milestoneText">Rider is at the restaurant</span>
+  </div>
+
+  <script src="./js/success.js"></script>
+  <script src="./js/ui.js"></script>
+</body>
+</html>

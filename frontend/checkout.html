@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Premium Checkout</title>
+  <link rel="stylesheet" href="./css/common.css"/>
+  <link rel="stylesheet" href="./css/checkout.css"/>
+</head>
+<body>
+  <div id="scrollProgress"></div>
+  <!-- Processing Overlay -->
+  <div id="processingOverlay" class="processing-overlay">
+    <div class="order-pulse"></div>
+    <div id="loaderFood" class="loader-food">🥘</div>
+    <div class="processing-text">Securing Your Meal...</div>
+    <div class="processing-sub">Talking to the kitchen 👨‍🍳</div>
+  </div>
+
+  <div class="wrap">
+
+    <div class="topbar">
+      <div class="brand">
+        <div class="logo">FD</div>
+        <div class="titleWrap">
+          <h2>Secure Checkout</h2>
+          <p>Fast delivery • Premium experience • Safe payments</p>
+        </div>
+      </div>
+
+      <div class="navRight" style="display:flex; align-items:center; gap:12px;">
+        <button class="pill" id="themeToggle" type="button">🌙 Dark</button>
+        <button class="pill" id="notifBtn" type="button" style="position:relative; padding:0 12px; font-size:18px;">
+          🔔
+          <span class="notifBadge" style="display:none;">0</span>
+        </button>
+        <div class="secureBadge">🔒 SSL Secured</div>
+      </div>
+    </div>
+
+    <div class="grid">
+
+      <!-- LEFT: Address + Payment -->
+      <div class="card">
+        <div class="cardHead">
+          <div>
+            <h3>Delivery Details</h3>
+            <div class="subHead">Where should we deliver your order?</div>
+          </div>
+
+          <div class="stepper">
+            <div class="step"><span class="dot">1</span>Address</div>
+            <div class="sep"></div>
+            <div class="step muted"><span class="dot">2</span>Payment</div>
+          </div>
+        </div>
+
+        <div class="cardBody">
+          <form id="checkoutForm">
+
+            <div class="formGrid">
+              <div class="field">
+                <label>Full Name</label>
+                <input id="name" required placeholder="Dhushyanth"/>
+              </div>
+
+              <div class="field">
+                <label>Phone</label>
+                <input id="phone" required placeholder="10-digit number"/>
+              </div>
+
+              <div class="field full">
+                <label>Address</label>
+                <textarea id="addr" required placeholder="House no, street, area..."></textarea>
+              </div>
+
+              <div class="field">
+                <label>City</label>
+                <input id="city" required placeholder="Nellore"/>
+              </div>
+
+              <div class="field">
+                <label>Pincode</label>
+                <input id="pin" required placeholder="6-digit pincode"/>
+              </div>
+            </div>
+
+            <div style="margin-top:14px"></div>
+
+            <div class="cardHead" style="border-radius:18px; border:1px solid rgba(255,255,255,.55);">
+              <div>
+                <h3>Payment Method</h3>
+                <div class="subHead">Choose one option to pay</div>
+              </div>
+            </div>
+
+            <!-- Radio inputs kept for checkout.js -->
+            <div class="payTabs">
+              <button type="button" class="payTab active" data-pay="COD">💵 COD</button>
+              <button type="button" class="payTab" data-pay="UPI">📱 UPI</button>
+              <button type="button" class="payTab" data-pay="CARD">💳 Card</button>
+              <button type="button" class="payTab" data-pay="WALLET">
+                🏦 Wallet
+                <span id="walletDisp" style="display:block; font-size:9px; opacity:0.7;">Bal: ₹0.00</span>
+              </button>
+            </div>
+
+            <div class="hide">
+              <label><input type="radio" name="pay" value="COD" checked> COD</label>
+              <label><input type="radio" name="pay" value="UPI"> UPI</label>
+              <label><input type="radio" name="pay" value="CARD"> CARD</label>
+              <label><input type="radio" name="pay" value="WALLET"> WALLET</label>
+            </div>
+
+            <div id="upiBox" class="hide" style="margin-top:10px">
+              <div class="field">
+                <label>UPI ID</label>
+                <input id="upi" placeholder="name@upi"/>
+              </div>
+              <p class="note">Tip: Google Pay / PhonePe / Paytm UPI accepted</p>
+            </div>
+
+            <div id="cardBox" class="hide" style="margin-top:10px">
+              <div class="formGrid">
+                <div class="field full">
+                  <label>Card Number</label>
+                  <input id="card" placeholder="xxxx xxxx xxxx xxxx"/>
+                </div>
+                <div class="field">
+                  <label>Expiry</label>
+                  <input id="exp" placeholder="MM/YY"/>
+                </div>
+                <div class="field">
+                  <label>CVV</label>
+                  <input id="cvv" placeholder="***"/>
+                </div>
+              </div>
+              <p class="note">We do not store your card details.</p>
+            </div>
+
+            <button class="btn" type="submit">Place Order</button>
+            <p id="msg" class="msg"></p>
+          </form>
+        </div>
+      </div>
+
+      <!-- RIGHT: Summary -->
+      <div class="card">
+        <div class="cardHead">
+          <div>
+            <h3>Order Summary</h3>
+            <div class="subHead">Review items before placing</div>
+          </div>
+          <div class="pill">🧾 Bill</div>
+        </div>
+
+        <div class="cardBody">
+          <div id="sumList" class="sumList"></div>
+
+          <!-- COUPON SYSTEM -->
+          <div style="margin-top:16px; padding:14px; background:rgba(0,0,0,.03); border-radius:18px; border:1px dashed rgba(0,0,0,.1);">
+            <div style="font-weight:900; font-size:12px; color:var(--muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:10px;">Apply Coupon</div>
+            <div style="display:flex; gap:8px;">
+              <input id="couponInput" placeholder="Enter code (e.g. FDGOLD)" style="flex:1; padding:10px 12px; border-radius:12px; border:1px solid rgba(0,0,0,.1); font-weight:800; outline:none;"/>
+              <button id="applyCoupon" type="button" class="miniBtn" style="padding:10px 16px; border-radius:12px;">Apply</button>
+            </div>
+            <div id="couponMsg" style="margin-top:8px; font-size:11px; font-weight:800;"></div>
+          </div>
+
+          <div class="totals">
+            <div><span>Subtotal</span><b id="sub">₹0</b></div>
+            <div><span>Delivery Fee</span><b id="del">₹0</b></div>
+            <div><span>Discount</span><b id="disc">-₹0</b></div>
+            <div class="hr"></div>
+            <div class="big"><span>Total</span><b id="tot">₹0</b></div>
+          </div>
+
+          <div class="trust">
+            <div class="pill">🚚 Fast Delivery</div>
+            <div class="pill">✅ Verified Restaurants</div>
+            <div class="pill">🔁 Easy Refunds</div>
+          </div>
+
+          <p class="note">By placing this order, you agree to our Terms & Privacy.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    // Premium payment tabs -> sync with radio buttons (checkout.js works)
+    const tabs = document.querySelectorAll(".payTab");
+    const radios = document.querySelectorAll('input[name="pay"]');
+
+    function setPay(v){
+      tabs.forEach(t => t.classList.toggle("active", t.dataset.pay === v));
+      radios.forEach(r => r.checked = (r.value === v));
+      // trigger change event so checkout.js shows correct box
+      document.querySelector('input[name="pay"]:checked')?.dispatchEvent(new Event("change"));
+    }
+
+    tabs.forEach(t => t.addEventListener("click", ()=> setPay(t.dataset.pay)));
+    setPay("COD");
+  </script>
+  <!-- SCRIPTS -->
+  <script src="./js/auth.js"></script>
+  <script src="./js/notifications.js"></script>
+  <script src="./js/ui.js"></script>
+  <script type="module" src="./js/checkout.js"></script>
+</body>
+</html>

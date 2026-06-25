@@ -1,0 +1,459 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Home • Food Delivery</title>
+  <link rel="stylesheet" href="./css/home.css"/>
+</head>
+<body>
+  <div class="mesh-bg"></div>
+  <div id="cursorGlow" class="cursor-glow"></div>
+  <div id="particles"></div>
+  <div id="bubbles" class="bubbles-container"></div>
+  <div class="scanner-line"></div>
+  
+  <!-- PARALLAX DEPTH LAYERS -->
+  <div class="parallax-layer layer-back" data-speed="0.05">
+    <span style="top:15%; left:10%;">🍕</span>
+    <span style="top:65%; left:85%;">🥑</span>
+    <span style="top:40%; left:5%;">🍿</span>
+  </div>
+  <div class="parallax-layer layer-mid" data-speed="0.15">
+    <span style="top:25%; left:75%;">🌶️</span>
+    <span style="top:80%; left:15%;">🍦</span>
+    <span style="top:10%; left:45%;">🍱</span>
+  </div>
+  <div class="parallax-layer layer-front" data-speed="0.3">
+    <span style="top:55%; left:65%;">🍣</span>
+    <span style="top:30%; left:25%;">🥟</span>
+    <span style="top:85%; left:80%;">🥘</span>
+  </div>
+
+  <!-- SCROLL PROGRESS BAR -->
+  <div id="scrollProgress"></div>
+
+  <!-- SPLASH SCREEN -->
+  <div id="splashScreen" style="position:fixed; inset:0; z-index:10000; background:var(--bg); display:flex; flex-direction:column; justify-content:center; align-items:center; transition:opacity 0.6s ease, visibility 0.6s ease;">
+      <div style="font-size:64px; animation:splashPulse 1.5s infinite alternate cubic-bezier(0.4, 0, 0.2, 1);">🍔</div>
+      <div style="font-weight:1000; font-size:24px; letter-spacing:-1px; margin-top:20px; background:linear-gradient(to right, #ff9a9e, #fecfef, #a18cd1); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;">Food Delivery</div>
+      <div style="font-weight:800; font-size:12px; color:var(--muted); margin-top:8px; letter-spacing:2px; text-transform:uppercase;">Premium Experience</div>
+  </div>
+
+  <!-- TRENDING TICKER -->
+  <div class="trending-ticker-wrap">
+    <div class="trending-ticker">
+      <span>🔥 TRENDING NOW: Use code <b>FESTIVE50</b> for 50% off on premium desserts! 🍰</span>
+      <span>⚡ FLASH DEAL: Buy 1 Get 1 Free on all Biryanis at Paradise Hotel! 🍲</span>
+      <span>🎉 NEW ARRIVAL: Trying out healthy salads? Check our green menu! 🥗</span>
+      <span>🔥 TRENDING NOW: Use code <b>FESTIVE50</b> for 50% off on premium desserts! 🍰</span>
+    </div>
+  </div>
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo">🍔</div>
+      <div>
+        <div class="brandTitle">Food Delivery</div>
+        <div class="brandSub">Restaurants • Menu • Checkout</div>
+      </div>
+    </div>
+
+    <nav class="navRight hide-on-mobile">
+      <div id="foodieLevel" class="foodie-level-badge" title="Your Foodie Level">⭐ Foodie</div>
+      <div id="userBadge" class="userBadge">👤 Guest</div>
+      <button id="themeToggle" class="btn ghost" style="font-size:18px;">🌙</button>
+      <a class="btn ghost active" href="home.html">🏠 Home</a>
+      <a class="btn ghost" href="menu.html">🍽️ Menu</a>
+      <a class="btn ghost active" href="cart.html">🛒 Cart <span id="cartCount" class="count cart-badge">0</span></a>
+      <button class="btn danger" id="logoutBtn" type="button">Logout</button>
+    </nav>
+  </header>
+
+  <!-- RESTAURANT STORIES (Insta-style) -->
+  <section class="wrap" style="padding-top:20px; padding-bottom:0;">
+    <div id="storiesContainer" style="display:flex; gap:16px; overflow-x:auto; padding-bottom:10px; scrollbar-width:none; -ms-overflow-style:none;">
+      <!-- JavaScript will populate this -->
+    </div>
+  </section>
+
+  <!-- HERO -->
+  <section class="hero reveal">
+    <div class="heroCard">
+      <!-- AMBIENT BLOBS -->
+      <div class="ambient-blob blob-1"></div>
+      <div class="ambient-blob blob-2"></div>
+      <div class="ambient-blob blob-3"></div>
+      
+      <div class="heroText">
+        <h1>Order from top restaurants near you ✨</h1>
+        <p>Choose a restaurant → open menu → add items → checkout</p>
+
+        <div class="heroStats">
+          <div class="stat"><b>9</b><span>Restaurants</span></div>
+          <div class="stat"><b>30+</b><span>Items</span></div>
+          <div class="stat"><b>25-35</b><span>Min ETA</span></div>
+        </div>
+
+        <button onclick="window.UI?.showSurpriseModal()" class="btn pulse-glow-btn" style="margin-top:20px; padding:12px 24px; border:none; border-radius:14px; font-weight:1000; font-size:16px; display:inline-flex; align-items:center; gap:8px; cursor:pointer;">
+          🎲 Surprise Me!
+        </button>
+      </div>
+
+      <div class="heroSearch">
+        <div class="searchWrap">
+          <span class="sIcon">🔎</span>
+          <input id="searchRest" style="flex:1;" placeholder="Search restaurants (biryani, pizza, desserts...)" />
+          <button id="voiceBtn" class="btn ghost" style="border:none; background:none; padding:0; font-size:20px; cursor:pointer;" title="Voice Search">🎤</button>
+        </div>
+
+        <div class="chips">
+          <button class="chip active" data-filter="all">✨ All</button>
+          <button class="chip" data-filter="biryani">🍛 Biryani</button>
+          <button class="chip" data-filter="pizza">🍕 Pizza</button>
+          <button class="chip" data-filter="desserts">🍨 Desserts</button>
+          <button class="chip" data-filter="south">🌶️ South</button>
+        </div>
+      </div>
+      
+      <!-- FLOATING 3D GRAPHIC -->
+      <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600&q=80" alt="Delicious Burger" class="hero-graphic" style="position:absolute; right:-50px; top:50%; transform:translateY(-50%); width:45%; z-index:1; mask-image: linear-gradient(to right, black 80%, transparent 100%); -webkit-mask-image: linear-gradient(to right, black 80%, transparent 100%); mix-blend-mode: multiply; pointer-events:none; opacity:0.8; animation: floatBurger 4s ease-in-out infinite;">
+      
+    </div>
+  </section>
+
+  <!-- PROMOTIONAL BANNERS -->
+  <section class="wrap reveal" style="padding-top:30px; padding-bottom:10px;">
+    <div class="promo-carousel">
+      <div class="promo-banner" style="background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%);">
+        <div class="promo-content">
+          <span class="promo-badge">Limited Time</span>
+          <h3>50% OFF</h3>
+          <p>On your first 3 orders</p>
+          <button class="promo-btn">Claim Now</button>
+        </div>
+        <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80" alt="Food" class="promo-img">
+      </div>
+      
+      <div class="promo-banner" style="background: linear-gradient(120deg, #d4fc79 0%, #96e6a1 100%);">
+        <div class="promo-content">
+          <span class="promo-badge" style="background:rgba(0,0,0,0.6); color:white;">Free Delivery</span>
+          <h3 style="color:#111;">Midnight Cravings</h3>
+          <p style="color:rgba(0,0,0,0.7);">Order above ₹399</p>
+          <button class="promo-btn" style="background:#111; color:white;">Order Now</button>
+        </div>
+        <img src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=400&q=80" alt="Pizza" class="promo-img">
+      </div>
+      
+      <div class="promo-banner" style="background: linear-gradient(to right, #4facfe 0%, #00f2fe 100%);">
+        <div class="promo-content">
+          <span class="promo-badge">Desserts</span>
+          <h3>Buy 1 Get 1</h3>
+          <p>On all premium cakes</p>
+          <button class="promo-btn" style="color:#00f2fe;">Explore</button>
+        </div>
+        <img src="https://images.unsplash.com/photo-1563805042-7684c019e1cb?w=400&q=80" alt="Dessert" class="promo-img" style="border-radius:50%;">
+      </div>
+    </div>
+  </section>
+
+  <!-- MOOD MATCHER SECTION -->
+  <section class="wrap reveal" style="padding-top:10px; padding-bottom:10px;">
+    <div class="sectionHead" style="margin-bottom: 16px;">
+        <h2 style="display: flex; align-items: center; gap: 8px;">🎭 What's your vibe?</h2>
+        <p>Pick a mood, and we'll pick the food!</p>
+    </div>
+    <div class="mood-grid">
+      <div class="mood-card" onclick="window.UI?.triggerMood('sad')">
+        <div class="mood-emoji">🌧️</div>
+        <div class="mood-name">Feeling Low</div>
+      </div>
+      <div class="mood-card" onclick="window.UI?.triggerMood('energy')">
+        <div class="mood-emoji">⚡</div>
+        <div class="mood-name">Need Energy</div>
+      </div>
+      <div class="mood-card" onclick="window.UI?.triggerMood('chill')">
+        <div class="mood-emoji">🛋️</div>
+        <div class="mood-name">Netflix & Chill</div>
+      </div>
+      <div class="mood-card" onclick="window.UI?.triggerMood('party')">
+        <div class="mood-emoji">🎉</div>
+        <div class="mood-name">Party Time</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SMART DNA RECOMMENDATIONS -->
+  <section id="dnaRecommendations" class="wrap reveal" style="display:none; padding-top:10px; padding-bottom:10px;">
+    <div class="sectionHead" style="margin-bottom: 16px;">
+        <h2 style="display: flex; align-items: center; gap: 8px;">🧬 Picked for your Taste DNA</h2>
+        <p>Based on your unique flavor profile</p>
+    </div>
+    <div id="dnaGrid" class="grid" style="grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));">
+        <!-- Injected by JS -->
+    </div>
+  </section>
+
+  <!-- RESTAURANTS (incl. Order Again & Recs) -->
+  <main class="wrap">
+    <!-- ORDER AGAIN SECTION -->
+    <div id="orderAgainSection" class="reveal" style="display:none; margin-bottom: 30px;">
+      <div class="sectionHead" style="margin-bottom: 16px;">
+        <h2 style="display: flex; align-items: center; gap: 8px;">🔄 Order Again</h2>
+        <p>Your recent favorites, ready to reorder</p>
+      </div>
+      <div id="orderAgainGrid" class="grid" style="grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));"></div>
+    </div>
+
+    <!-- RECOMMENDED SECTION -->
+    <div id="recsSection" class="reveal" style="display:none; margin-bottom: 30px;">
+        <div class="sectionHead" style="margin-bottom: 16px;">
+            <h2 style="display: flex; align-items: center; gap: 8px;">✨ Recommended for You</h2>
+            <p>Based on your past favorites</p>
+        </div>
+        <div id="recsGrid" class="grid" style="grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));"></div>
+    </div>
+
+    <!-- TOP BRANDS SECTION -->
+    <div id="brandsSection" class="stagger-in" style="margin-bottom: 40px;">
+        <div class="sectionHead" style="margin-bottom: 16px;">
+            <h2 style="display: flex; align-items: center; gap: 8px;">🌟 Top Brands For You</h2>
+            <p>Most loved by our foodie community</p>
+        </div>
+        <div id="brandsGrid" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap:20px; text-align:center;">
+            <!-- Populated by JS -->
+        </div>
+    </div>
+
+    <!-- MAIN RESTAURANTS DIRECTORY -->
+    <div class="sectionHead">
+      <h2>All Restaurants</h2>
+      <p>Tap “Open Menu” to view items</p>
+    </div>
+
+    <div id="restGrid" class="grid"></div>
+  </main>
+
+  <!-- MEGA FOOTER -->
+  <footer class="mega-footer">
+    <div class="mf-inner">
+      <div class="mf-grid">
+        <div class="mf-brand-col">
+          <div style="font-size:32px; font-weight:1000; letter-spacing:-1px; margin-bottom:10px;">🍔 Food Delivery</div>
+          <p style="color:rgba(255,255,255,0.6); font-weight:800; font-size:14px; line-height:1.6;">Your favorite meals, delivered incredibly fast. Experience premium dining from the comfort of your home.</p>
+          <div style="margin-top:24px; display:flex; gap:10px;">
+             <!-- Mock App Store Badges -->
+             <div style="background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); padding:8px 16px; border-radius:12px; cursor:pointer; display:inline-flex; align-items:center; gap:8px;">
+                 <span style="font-size:24px;">🍏</span> <div style="text-align:left; line-height:1.2;"><div style="font-size:10px; opacity:0.7;">Download on the</div><div style="font-weight:900; font-size:14px;">App Store</div></div>
+             </div>
+          </div>
+        </div>
+        
+        <div class="mf-links">
+          <h4>Company</h4>
+          <a href="#">About Us</a>
+          <a href="#">Careers</a>
+          <a href="#">Team</a>
+          <a href="#">Food Delivery Gold</a>
+        </div>
+        
+        <div class="mf-links">
+          <h4>Legal</h4>
+          <a href="#">Terms & Conditions</a>
+          <a href="#">Privacy Policy</a>
+          <a href="#">Cookie Policy</a>
+          <a href="#">Partner with us</a>
+        </div>
+
+        <div class="mf-newsletter">
+          <h4>Subscribe to our Newsletter</h4>
+          <p>Get exclusive discounts and early access to new premium restaurants.</p>
+          <div class="mf-input-group">
+            <input type="email" placeholder="Enter your email" />
+            <button>Subscribe</button>
+          </div>
+        </div>
+      </div>
+      
+      <div class="mf-bottom">
+        <div>© 2026 Premium Food Delivery. All rights reserved.</div>
+        <div style="display:flex; gap:20px;">
+          <a href="#">Twitter</a>
+          <a href="#">Instagram</a>
+          <a href="#">LinkedIn</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- FLOATING SPIN BUTTON -->
+  <button id="floatingSpinBtn" class="floating-spin-btn" aria-label="Daily Spin to Win" onclick="window.UI?.showSpinWheel()">
+    🎡
+  </button>
+
+  <!-- SPIN WHEEL MODAL -->
+  <div id="spinModal" class="spin-modal-overlay">
+    <div class="spin-modal">
+      <h2 style="margin:0 0 10px; font-weight:1000; font-size:24px;">Daily Spin! 🎡</h2>
+      <p style="margin:0 0 20px; color:var(--muted); font-weight:800; font-size:14px;">Spin the wheel to win delicious prizes!</p>
+      
+      <div class="wheel-container">
+        <div class="wheel-pin"></div>
+        <div id="wheel" class="wheel"></div>
+      </div>
+      
+      <button id="spinBtn" class="spin-btn">Spin to Win</button>
+      <button onclick="window.UI?.closeSpinWheel()" style="margin-top:16px; background:none; border:none; color:var(--muted); font-weight:800; cursor:pointer;">Maybe Later</button>
+    </div>
+  </div>
+
+  <!-- FULL SCREEN STORY VIEWER -->
+  <div id="storyViewer" style="display:none; position:fixed; inset:0; z-index:9999; background:#000; flex-direction:column;">
+     <div style="position:absolute; top:20px; left:20px; right:20px; display:flex; gap:6px; z-index:10002;" id="storyProgressContainer"></div>
+     
+     <div style="position:absolute; top:40px; left:20px; right:20px; display:flex; justify-content:space-between; align-items:center; z-index:10002; color:white; text-shadow:0 2px 8px rgba(0,0,0,0.8);">
+        <div style="display:flex; align-items:center; gap:10px;">
+           <img id="storyAvatar" src="" style="width:40px; height:40px; border-radius:50%; object-fit:cover; border:2px solid white;">
+           <div>
+               <div id="storyName" style="font-weight:1000; font-size:16px;">Name</div>
+               <div style="font-size:12px; font-weight:800; opacity:0.9;">Sponsored</div>
+           </div>
+        </div>
+        <button id="closeStoryBtn" style="background:rgba(0,0,0,0.5); border:none; color:white; width:36px; height:36px; border-radius:50%; font-size:16px; cursor:pointer; display:grid; place-items:center; backdrop-filter:blur(5px);">✕</button>
+     </div>
+     
+     <div id="storyContent" style="flex:1; position:relative; display:grid; place-items:center; overflow:hidden;">
+         <img id="storyBg" src="" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; filter:brightness(0.7) blur(10px); z-index:1;">
+         <img id="storyImg" src="" style="width:100%; max-height:80vh; object-fit:contain; position:relative; z-index:2; border-radius:24px; box-shadow:0 15px 40px rgba(0,0,0,0.5);">
+         
+         <!-- Story Action / Text -->
+         <div style="position:absolute; bottom:50px; left:20px; right:20px; z-index:3; text-align:center;">
+             <h2 id="storyItemName" style="color:white; font-size:32px; font-weight:1000; margin:0 0 10px; text-shadow:0 4px 12px rgba(0,0,0,0.8);">Title</h2>
+             <button id="storyOrderBtn" style="background:linear-gradient(135deg, #fc8019, #e06b12); color:white; border:none; padding:16px 36px; border-radius:999px; font-size:18px; font-weight:1000; cursor:pointer; box-shadow:0 8px 24px rgba(252,128,25,0.5); transition:transform 0.2s;">
+                 Order Now 🚀
+             </button>
+         </div>
+         
+         <!-- Hit areas for tapping left/right -->
+         <div id="storyLeftTap" style="position:absolute; left:0; top:0; bottom:0; width:30%; z-index:10001; cursor:pointer;"></div>
+         <div id="storyRightTap" style="position:absolute; right:0; top:0; bottom:0; width:70%; z-index:10001; cursor:pointer;"></div>
+     </div>
+  </div>
+
+    </div>
+  </div>
+
+  <!-- SURPRISE ME MODAL -->
+  <div id="surpriseModal" class="spin-modal-overlay">
+    <div class="spin-modal" style="max-width:450px;">
+      <div style="font-size:60px; margin-bottom:20px;">🎲</div>
+      <h2 style="margin:0 0 10px; font-weight:1000;">Feeling Lucky?</h2>
+      <p style="margin:0 0 24px; color:var(--muted); font-weight:800; font-size:14px;">We've picked a special restaurant for you based on today's trending flavors!</p>
+      
+      <div id="surpriseCard" class="rcard" style="margin-bottom:24px; pointer-events:none; opacity:1; transform:none; animation:none;">
+          <!-- Populated by JS -->
+      </div>
+      
+      <div style="display:flex; gap:12px;">
+          <button id="surpriseGoBtn" class="btn" style="flex:1; background:var(--accent); color:white; border:none; padding:14px; border-radius:16px; font-weight:1000;">Let's Go! 🚀</button>
+          <button onclick="window.UI?.closeSurpriseModal()" class="btn" style="padding:14px; border-radius:16px;">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- VOICE SEARCH MODAL -->
+  <div id="voiceModal" class="spin-modal-overlay">
+    <div class="spin-modal">
+        <div class="voice-ripple" id="voiceRipple">
+            <div class="v-circle"></div>
+            <div class="v-circle"></div>
+            <div class="v-circle"></div>
+            <div class="v-icon">🎤</div>
+        </div>
+        <h2 style="margin:20px 0 10px; font-weight:1000;">Listening...</h2>
+        <p id="voiceStatus" style="color:var(--muted); font-weight:800;">Say 'Biryani', 'Pizza', or 'Desserts'</p>
+        <button onclick="window.UI?.closeVoiceSearch()" class="btn" style="margin-top:20px; width:100%; border-radius:16px;">Cancel</button>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <!-- LIVE ORDER POPUP -->
+  <div id="liveOrderToast" style="position:fixed; bottom:90px; left:24px; background:var(--card); border:1px solid var(--stroke); border-radius:16px; padding:12px 16px; display:flex; align-items:center; gap:12px; box-shadow:0 10px 30px rgba(0,0,0,0.1); z-index:8800; transform:translateX(-150%); transition:transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1); max-width:300px;">
+     <img id="loImg" src="" style="width:40px; height:40px; border-radius:10px; object-fit:cover;">
+     <div>
+        <div style="font-size:11px; color:var(--muted); font-weight:800; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:2px;">Someone just ordered</div>
+        <div id="loText" style="font-weight:900; font-size:14px; color:var(--text); line-height:1.2;">Biryani</div>
+     </div>
+  </div>
+
+  <!-- SCROLL TO TOP FAB -->
+  <button id="scrollTopBtn" class="scroll-top-btn" aria-label="Scroll to top">
+    ↑
+  </button>
+  
+  <!-- FLASH DEAL TOAST -->
+  <div id="flashDealToast" class="flash-deal-toast">
+    <div class="flash-deal-content">
+      <div class="flash-icon">🎁</div>
+      <div>
+        <h4>Secret Deal Unlocked!</h4>
+        <p>Use code <strong>SECRET20</strong> for 20% off your cart today.</p>
+      </div>
+      <button id="closeFlashBtn" class="flash-close">&times;</button>
+    </div>
+  </div>
+
+  <!-- FLOATING BOTTOM PAD (MOBILE/TABLET) -->
+  <nav class="bottom-pad show-on-mobile">
+      <a href="home.html" class="pad-item active">
+          <div class="pad-icon">🏠</div>
+          <span>Home</span>
+      </a>
+      <a href="menu.html" class="pad-item">
+          <div class="pad-icon">🔍</div>
+          <span>Search</span>
+      </a>
+      <a href="cart.html" class="pad-item">
+          <div class="pad-icon" style="position:relative;">
+              🛒<span id="navCartCountMobile" style="position:absolute; top:-6px; right:-10px; background:var(--orange); color:white; border-radius:10px; padding:2px 6px; font-size:10px; font-weight:1000;">0</span>
+          </div>
+          <span>Cart</span>
+      </a>
+      <a href="#" class="pad-item">
+          <div class="pad-icon">👤</div>
+          <span>Profile</span>
+      </a>
+  </nav>
+
+  <!-- MAGIC REORDER FAB -->
+  <button id="magicReorderBtn" class="magic-reorder-fab" onclick="window.UI?.triggerMagicReorder()">
+    🪄
+  </button>
+  
+  <!-- VOICE SEARCH MODAL -->
+  <div id="voiceModal" class="modal-overlay" style="z-index: 9500;">
+    <div class="modal-content" style="max-width: 400px; padding: 40px; text-align: center;">
+        <h2 class="sectionTitle">Voice Search</h2>
+        <p style="color: var(--muted); margin-bottom: 30px; font-weight: 800;">Listening for "Biryani", "Pizza", "Desserts"...</p>
+        
+        <div class="voice-visualizer">
+            <div class="v-wave"></div>
+            <div class="v-wave"></div>
+            <div class="v-wave"></div>
+            <div class="v-wave"></div>
+            <div class="v-wave"></div>
+            <div class="v-icon">🎤</div>
+        </div>
+
+        <div id="voiceStatus" style="margin-top: 30px; font-weight: 1000; font-size: 18px; color: var(--accent); min-height: 24px;"></div>
+        
+        <button onclick="window.UI?.closeVoiceSearch()" class="btn ghost" style="margin-top: 30px; width: 100%; justify-content: center; border-radius: 14px;">Cancel</button>
+    </div>
+  </div>
+
+  <script src="./js/ui.js"></script>
+  <script src="./js/home.js"></script>
+</body>
+</html>

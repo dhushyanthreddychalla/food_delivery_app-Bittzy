@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your Profile • Food Delivery</title>
+  <link rel="stylesheet" href="./css/theme.css">
+  <link rel="stylesheet" href="./css/common.css">
+  <style>
+    .refer-card {
+      background: linear-gradient(135deg, rgba(255,122,24,0.08), rgba(255,77,77,0.08));
+      border: 1px solid rgba(255,122,24,0.2);
+      border-radius: 20px;
+      padding: 24px;
+      position: relative;
+      overflow: hidden;
+    }
+    .refer-card::before {
+      content: '';
+      position: absolute;
+      top: -50px;
+      right: -50px;
+      width: 150px;
+      height: 150px;
+      background: radial-gradient(circle, rgba(252,128,25,0.1) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .rewards-list {
+      margin-top: 20px;
+      display: grid;
+      gap: 12px;
+    }
+    .reward-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 16px;
+      background: rgba(0,0,0,0.02);
+      border-radius: 12px;
+      border: 1px solid rgba(0,0,0,0.03);
+      font-size: 13px;
+    }
+    .reward-status {
+      padding: 4px 10px;
+      border-radius: 8px;
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+    .status-credited { background: rgba(22,163,74,0.1); color: #16a34a; }
+    .status-pending { background: rgba(234,179,8,0.1); color: #ca8a04; }
+
+    .btn-review {
+      background: rgba(252,128,25,0.05);
+      color: var(--orange);
+      border: 1px solid rgba(252,128,25,0.2);
+      padding: 6px 14px;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .btn-review:hover { background: var(--orange); color: white; }
+
+    .wallet-card {
+      background: linear-gradient(135deg, #1e293b, #0f172a);
+      color: white;
+      border-radius: 20px;
+      padding: 24px;
+      margin-top: 20px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 10px 25px rgba(15,23,42,0.15);
+    }
+    .wallet-card::after {
+      content: '💳';
+      position: absolute;
+      right: -10px;
+      bottom: -10px;
+      font-size: 80px;
+      opacity: 0.1;
+      transform: rotate(-15deg);
+    }
+    .wallet-balance {
+      font-size: 32px;
+      font-weight: 1000;
+      margin: 8px 0;
+      color: #ffd700;
+    }
+    .transaction-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 12px 14px;
+      background: rgba(255,255,255,0.03);
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.05);
+      margin-bottom: 8px;
+      font-size: 13px;
+    }
+    .tx-type { font-weight: 800; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .tx-amount.plus { color: #4ade80; }
+    .tx-amount.minus { color: #f87171; }
+
+    html.dark .transaction-item { background: rgba(0,0,0,0.1); border-color: rgba(255,255,255,0.02); }
+
+    /* --- GAMIFICATION BADGE --- */
+    .foodie-level-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #FFD700, #FFA500);
+      color: #000;
+      font-weight: 1000;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      box-shadow: 0 4px 10px rgba(255, 215, 0, 0.3);
+      animation: badgeGlow 2s infinite alternate;
+    }
+    @keyframes badgeGlow {
+      from { box-shadow: 0 4px 10px rgba(255, 215, 0, 0.3); }
+      to { box-shadow: 0 4px 20px rgba(255, 215, 0, 0.6); }
+    }
+
+    /* --- TASTE DNA --- */
+    .dna-row { display: flex; align-items: center; gap: 15px; }
+    .dna-label { width: 120px; font-size: 13px; font-weight: 800; color: var(--text); }
+    .dna-bar-bg { flex: 1; height: 10px; background: rgba(0,0,0,0.05); border-radius: 5px; overflow: hidden; }
+    html.dark .dna-bar-bg { background: rgba(255,255,255,0.05); }
+    .dna-bar { height: 100%; border-radius: 5px; transition: width 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+  </style>
+</head>
+<body class="stagger-in">
+  <div id="scrollProgress"></div>
+  <div class="mesh-bg"></div>
+  <div id="floatingIcons"></div>
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo">👤</div>
+      <div>
+        <div class="brandTitle">My Profile</div>
+        <div class="brandSub">Settings • History • Addresses</div>
+      </div>
+    </div>
+
+    <div class="navRight">
+      <button class="pill" id="themeToggle" type="button" onclick="window.toggleGlobalTheme(event)">🌙 Dark</button>
+      <div id="foodieLevel" class="foodie-level-badge" style="margin-right:10px;">⭐ Foodie</div>
+      <div id="goldBadge" class="pill" style="background:linear-gradient(135deg,#ffd700,#ffa500); color:#000; border:none; font-weight:1000; box-shadow:0 0 15px rgba(255,215,0,.3);">🏆 FD GOLD</div>
+      <a class="pill" href="index.html">🏠 Home</a>
+      <a class="pill" href="menu.html">🍽️ Menu</a>
+      <a class="pill" href="cart.html">
+        🛒 Cart <span id="cartCount" class="count cart-badge">0</span>
+      </a>
+      <button class="btn btnDanger" id="logoutBtn">Logout</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="profile-card glass-card-entry tilt-card">
+      <div class="profile-header">
+        <div class="profile-img" id="profileShort">G</div>
+        <div style="flex:1">
+          <div style="display:flex; justify-content:space-between; align-items:start;">
+            <div>
+              <h2 id="userName" style="margin:0">Guest User</h2>
+              <p id="userEmail" class="small" style="margin:4px 0 0">guest@example.com</p>
+            </div>
+            <div style="background:linear-gradient(135deg,#ffd700,#ffa500); color:#000; padding:8px 16px; border-radius:12px; font-weight:1000; font-size:12px; box-shadow:0 4px 12px rgba(255,215,0,.4);">FD GOLD MEMBER</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-title">💳 My Digital Wallet</div>
+      <div class="wallet-card">
+        <div style="font-size:12px; font-weight:1000; text-transform:uppercase; color:rgba(255,255,255,0.6);">Available Credits</div>
+        <div class="wallet-balance" id="walletBalance">₹0.00</div>
+        <div style="font-size:11px; color:rgba(255,255,255,0.4); font-weight:800;">Instant checkouts • Referral rewards • Refunds</div>
+        
+        <div style="margin-top:24px;">
+          <h5 style="margin:0 0 12px; font-size:11px; text-transform:uppercase; color:rgba(255,255,255,0.5); letter-spacing:1px; font-weight:1000;">Transaction History</h5>
+          <div id="transactionList">
+            <!-- Transactions injected here -->
+          </div>
+        </div>
+      </div>
+
+      <div class="section-title">🕒 My Recent Activity</div>
+      <div id="recentActivityList" style="margin-bottom:24px; display:grid; gap:12px;">
+        <p class="small">No recent activity detected.</p>
+      </div>
+
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <div class="section-title">📍 Saved Addresses</div>
+        <button id="manageAddrBtn" class="btn-review" style="margin-top:8px;">Manage</button>
+      </div>
+      <div id="savedAddressesList" style="margin-bottom:24px; display:grid; gap:12px;">
+        <p class="small">No saved addresses yet.</p>
+      </div>
+
+      <div class="section-title">🤝 Referral Credits Dashboard</div>
+      <div class="refer-card tilt-card">
+        <div style="display:flex; align-items:flex-start; gap:20px;">
+          <div style="font-size:48px; filter:drop-shadow(0 8px 16px rgba(252,128,25,0.2));">🎁</div>
+          <div style="flex:1">
+            <h4 style="margin:0; font-size:18px; font-weight:1000;">Refer your friends & get ₹100</h4>
+            <p style="margin:6px 0 16px; font-size:13px; color:var(--muted); font-weight:1000;">When they place their first order above ₹300</p>
+            
+            <div style="display:flex; gap:12px; margin-bottom:20px;">
+              <div id="referCode" style="background:var(--bg-white); border:1px solid rgba(252,128,25,0.2); padding:10px 20px; border-radius:14px; font-weight:1000; letter-spacing:1.5px; flex:1; text-align:center; font-size:16px; box-shadow:0 4px 12px rgba(0,0,0,0.03);">GUESTFL100</div>
+              <button id="copyReferBtn" class="pill" style="height:46px; background:var(--orange); color:white; border:none; padding:0 24px; font-weight:1000; box-shadow:0 6px 15px rgba(252,128,25,0.3);">Copy</button>
+            </div>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+              <div style="background:rgba(22,163,74,0.05); padding:12px; border-radius:14px; border:1px solid rgba(22,163,74,0.1);">
+                <div style="font-size:10px; text-transform:uppercase; color:#16a34a; font-weight:1000;">Total Earned</div>
+                <div style="font-size:18px; font-weight:1000; color:#16a34a;">₹400.00</div>
+              </div>
+              <div style="background:rgba(252,128,25,0.05); padding:12px; border-radius:14px; border:1px solid rgba(252,128,25,0.1);">
+                <div style="font-size:10px; text-transform:uppercase; color:var(--orange); font-weight:1000;">Friends Referred</div>
+                <div style="font-size:18px; font-weight:1000; color:var(--orange);">4</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top:24px; padding-top:20px; border-top:1px solid rgba(0,0,0,0.05);">
+          <h5 style="margin:0 0 12px; font-size:11px; text-transform:uppercase; color:var(--muted); letter-spacing:1px; font-weight:1000;">Recent Activity</h5>
+          <div class="rewards-list">
+            <div class="reward-item">
+              <div>
+                <b style="font-weight:900;">Rahul Sharma</b>
+                <div style="font-size:11px; color:var(--muted); margin-top:2px;">Joined via your link</div>
+              </div>
+              <div style="text-align:right">
+                <div style="font-weight:1000; color:#16a34a;">+ ₹100</div>
+                <span class="reward-status status-credited">Credited</span>
+              </div>
+            </div>
+            <div class="reward-item">
+              <div>
+                <b style="font-weight:900;">Sneha Kapoor</b>
+                <div style="font-size:11px; color:var(--muted); margin-top:2px;">Order in progress</div>
+              </div>
+              <div style="text-align:right">
+                <div style="font-weight:1000; color:var(--muted);">₹100</div>
+                <span class="reward-status status-pending">Pending</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-title">📦 Order History</div>
+      <div id="orderHistoryList">
+        <p class="small">Loading history...</p>
+      </div>
+    </div>
+  </main>
+
+  <script src="./js/auth.js"></script>
+  <script src="./js/ui.js"></script>
+  <script src="./js/theme.js"></script>
+  <script src="./js/notifications.js"></script>
+  <script src="./js/reviews.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      if(!AUTH.isLoggedIn()) {
+        window.location.href = "login.html?next=profile.html";
+        return;
+      }
+
+      const email = AUTH.getEmail();
+      document.getElementById("userName").textContent = email.split('@')[0].toUpperCase();
+      document.getElementById("userEmail").textContent = email;
+      document.getElementById("profileShort").textContent = email.charAt(0).toUpperCase();
+
+      // Foodie Level
+      const updateFoodieLevel = () => {
+        const history = JSON.parse(localStorage.getItem("fd_order_history") || "[]");
+        const levelEl = document.getElementById("foodieLevel");
+        if (!levelEl) return;
+        const count = history.length;
+        let label = "⭐ Foodie";
+        let color = "linear-gradient(135deg, #FFD700, #FFA500)";
+        if (count >= 10) { label = "👑 Master Chef"; color = "linear-gradient(135deg, #8E2DE2, #4A00E0)"; levelEl.style.color = "white"; }
+        else if (count >= 5) { label = "👨‍🍳 Gourmet"; color = "linear-gradient(135deg, #00c6ff, #0072ff)"; levelEl.style.color = "white"; }
+        levelEl.textContent = label;
+        levelEl.style.background = color;
+      };
+      updateFoodieLevel();
+
+      // Premium Gold Toggle
+    const goldToggle = document.getElementById("goldToggle");
+    const isGold = localStorage.getItem("fd_premium_gold") === "true";
+    if (goldToggle) {
+        goldToggle.checked = isGold;
+        goldToggle.addEventListener("change", (e) => {
+            localStorage.setItem("fd_premium_gold", e.target.checked);
+            if (typeof window.applyPremiumGold === 'function') {
+                window.applyPremiumGold(e.target.checked);
+            }
+            if (typeof toast === 'function') {
+                toast(e.target.checked ? "✨ Premium Gold Activated!" : "Standard Theme Restored");
+            }
+        });
+    }
+
+      // Taste DNA Logic
+      const updateTasteDna = () => {
+        const history = JSON.parse(localStorage.getItem("fd_order_history") || "[]").slice(0, 20);
+        if (history.length === 0) {
+            // Default random-ish but low values for new users
+            const defaults = { spicy: 10, comfort: 15, healthy: 5, sweet: 8 };
+            Object.keys(defaults).forEach(k => {
+                const el = document.getElementById("dna" + k.charAt(0).toUpperCase() + k.slice(1));
+                if(el) el.style.width = defaults[k] + "%";
+            });
+            return;
+        }
+
+        let stats = { spicy: 0, comfort: 0, healthy: 0, sweet: 0, total: 0 };
+        history.forEach(order => {
+            if (order.cart) {
+                order.cart.forEach(item => {
+                    const cat = (item.cat || "").toLowerCase();
+                    if (["biryani", "south"].includes(cat)) stats.spicy++;
+                    else if (["pizza", "burger"].includes(cat)) stats.comfort++;
+                    else if (cat === "desserts") stats.sweet++;
+                    else if (cat === "veg") stats.healthy++;
+                    stats.total++;
+                });
+            }
+        });
+
+        if (stats.total > 0) {
+            const getPct = (v) => Math.min(Math.round((v / stats.total) * 100), 100);
+            document.getElementById("dnaSpicy").style.width = Math.max(10, getPct(stats.spicy)) + "%";
+            document.getElementById("dnaComfort").style.width = Math.max(10, getPct(stats.comfort)) + "%";
+            document.getElementById("dnaHealthy").style.width = Math.max(10, getPct(stats.healthy)) + "%";
+            document.getElementById("dnaSweet").style.width = Math.max(10, getPct(stats.sweet)) + "%";
+        }
+      };
+      setTimeout(updateTasteDna, 500);
+
+      // Wallet System Init
+      const walletBalanceEl = document.getElementById("walletBalance");
+      const transactionList = document.getElementById("transactionList");
+      
+      const initializeWallet = () => {
+        let balance = localStorage.getItem("fd_wallet_balance");
+        if (balance === null) {
+          balance = "400.00"; // Starting credits (matches referrals)
+          localStorage.setItem("fd_wallet_balance", balance);
+          
+          const initialTx = [
+            { type: "credit", desc: "Welcome Bonus", amount: 100, date: "3 days ago" },
+            { type: "credit", desc: "Referral: Rahul Sharma", amount: 100, date: "2 days ago" },
+            { type: "credit", desc: "Referral: Priya K.", amount: 100, date: "1 day ago" },
+            { type: "credit", desc: "Order Cashback #9A2", amount: 100, date: "Just now" }
+          ];
+          localStorage.setItem("fd_transactions", JSON.stringify(initialTx));
+        }
+        
+        walletBalanceEl.textContent = `₹${parseFloat(balance).toFixed(2)}`;
+        
+        const txs = JSON.parse(localStorage.getItem("fd_transactions") || "[]");
+        transactionList.innerHTML = txs.map(tx => `
+          <div class="transaction-item">
+            <div>
+              <div class="tx-type" style="color:${tx.type === 'credit' ? '#4ade80' : '#f87171'}">${tx.type}</div>
+              <div style="font-weight:1000; margin-top:2px;">${tx.desc}</div>
+              <div style="font-size:10px; color:rgba(255,255,255,0.4);">${tx.date}</div>
+            </div>
+            <div class="tx-amount ${tx.type === 'credit' ? 'plus' : 'minus'}" style="font-weight:1000;">
+              ${tx.type === 'credit' ? '+' : '-'}₹${tx.amount.toFixed(2)}
+            </div>
+          </div>
+        `).join("");
+      };
+      initializeWallet();
+
+      // Render Order History
+      const historyList = document.getElementById("orderHistoryList");
+      const history = JSON.parse(localStorage.getItem("fd_order_history") || "[]");
+
+      if (history.length === 0) {
+        historyList.innerHTML = `<p class="small">You haven't placed any orders yet. <a href="menu.html" style="color:var(--orange)">Order now!</a></p>`;
+      } else {
+        historyList.innerHTML = history.map(order => {
+          const subtotal = order.cart.reduce((sum, it) => sum + (it.qty * it.price), 0);
+          const total = subtotal - (order.discount || 0);
+          const review = JSON.parse(localStorage.getItem(`fd_order_review_${order.id}`) || "null");
+          
+          return `
+            <div class="order-card" data-order-id="${order.id}">
+              <div class="order-header">
+                <div>
+                  <span class="order-id">#${order.id}</span>
+                  <div style="font-size:11px; color:var(--muted); margin-top:2px;">Placed on ${new Date().toLocaleDateString()}</div>
+                </div>
+                <span class="order-status">DELIVERED</span>
+              </div>
+              <div class="order-items">
+                ${order.cart.map(it => `${it.qty}x ${it.name}`).join(', ')}
+              </div>
+              <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-top:12px; gap:8px;">
+                <div class="order-total">₹${total}</div>
+                <div style="display:flex; gap:8px;">
+                  <button class="btn-review" style="background:rgba(16,183,74,0.1); color:#16a34a; border-color:rgba(16,183,74,0.2);" onclick="event.stopPropagation(); window.reorder('${order.id}')">Reorder 🔄</button>
+                  ${review ? `
+                    <div style="font-size:11px; color:#16a34a; font-weight:800; display:flex; align-items:center; gap:4px; padding:6px 0;">
+                      ${"⭐".repeat(review.stars)}
+                    </div>
+                  ` : `
+                    <button class="btn-review" onclick="event.stopPropagation(); REVIEWS.openReviewModal('${order.id}')">Rate Order</button>
+                  `}
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      // Render Recent Activity (Reviews)
+      const renderActivity = () => {
+        const activityList = document.getElementById("recentActivityList");
+        const reviews = JSON.parse(localStorage.getItem("fd_all_reviews") || "[]");
+        
+        if (reviews.length === 0) {
+          activityList.innerHTML = `<p class="small">No reviews posted yet.</p>`;
+          return;
+        }
+
+        activityList.innerHTML = reviews.map(r => `
+          <div class="reward-item" style="display:block; padding:15px; background:rgba(252,128,25,0.03); border:1px solid rgba(252,128,25,0.1);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+              <span style="font-size:10px; text-transform:uppercase; font-weight:1000; color:var(--orange);">ORDER REVIEW #${r.orderId}</span>
+              <span style="color:#ffb800; font-size:12px;">${"⭐".repeat(r.stars)}</span>
+            </div>
+            <p style="margin:0; font-size:13px; font-weight:1000;">"${r.comment}"</p>
+            <div style="font-size:10px; color:var(--muted); margin-top:6px;">${new Date(r.date).toLocaleDateString()} • ${new Date(r.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
+          </div>
+        `).join('');
+      };
+      renderActivity();
+      
+      // Render Saved Addresses
+      const savedAddressesList = document.getElementById("savedAddressesList");
+      const addressManagerList = document.getElementById("addressManagerList");
+      const addrModal = document.getElementById("addressModal");
+      
+      const renderAddresses = () => {
+        let addresses = JSON.parse(localStorage.getItem("fd_saved_addresses") || "[]");
+        
+        // Initial mock addresses if none
+        if (addresses.length === 0) {
+          addresses = [
+            { id: 1, type: "Home", name: "Guest User", phone: "9876543210", addr: "123, Green Park", city: "New Delhi", pin: "110001" }
+          ];
+          localStorage.setItem("fd_saved_addresses", JSON.stringify(addresses));
+        }
+
+        // Render in Profile View
+        savedAddressesList.innerHTML = addresses.map(a => `
+          <div class="address-card">
+            <div class="address-icon">${a.type === 'Home' ? '🏠' : a.type === 'Work' ? '🏢' : '📍'}</div>
+            <div class="address-details">
+              <b>${a.type}</b> • ${a.name}<br/>
+              ${a.addr}, ${a.city} - ${a.pin}<br/>
+              Phone: ${a.phone}
+            </div>
+          </div>
+        `).join('');
+
+        // Render in Manager Modal
+        addressManagerList.innerHTML = addresses.map(a => `
+          <div class="reward-item" style="background:rgba(0,0,0,0.02);">
+            <div style="flex:1">
+              <b style="font-weight:900;">${a.type}: ${a.name}</b>
+              <div style="font-size:11px; color:var(--muted); margin-top:2px;">${a.addr}, ${a.city}</div>
+            </div>
+            <button onclick="deleteAddress(${a.id})" style="background:none; border:none; cursor:pointer; font-size:16px; padding:5px;">🗑️</button>
+          </div>
+        `).join('');
+      };
+
+      window.deleteAddress = (id) => {
+        let addresses = JSON.parse(localStorage.getItem("fd_saved_addresses") || "[]");
+        addresses = addresses.filter(a => a.id !== id);
+        localStorage.setItem("fd_saved_addresses", JSON.stringify(addresses));
+        renderAddresses();
+      };
+
+      document.getElementById("manageAddrBtn").onclick = () => {
+        renderAddresses();
+        addrModal.style.display = "flex";
+      };
+
+      document.getElementById("closeAddrModal").onclick = () => addrModal.style.display = "none";
+
+      document.getElementById("saveNewAddr").onclick = () => {
+        const name = document.getElementById("newAddrName").value.trim();
+        const phone = document.getElementById("newAddrPhone").value.trim();
+        const addr = document.getElementById("newAddrFull").value.trim();
+        const city = document.getElementById("newAddrCity").value.trim();
+        const pin = document.getElementById("newAddrPin").value.trim();
+        const type = document.getElementById("newAddrType").value;
+
+        if (!name || !phone || !addr || !city || !pin) return alert("Please fill all fields!");
+
+        const newAddr = { id: Date.now(), type, name, phone, addr, city, pin };
+        const addresses = JSON.parse(localStorage.getItem("fd_saved_addresses") || "[]");
+        addresses.push(newAddr);
+        localStorage.setItem("fd_saved_addresses", JSON.stringify(addresses));
+        
+        // Clear forms
+        document.getElementById("newAddrName").value = "";
+        document.getElementById("newAddrPhone").value = "";
+        document.getElementById("newAddrFull").value = "";
+        document.getElementById("newAddrCity").value = "";
+        document.getElementById("newAddrPin").value = "";
+        
+        renderAddresses();
+        alert("Address saved successfully!");
+      };
+      renderAddresses();
+
+      // Reorder Logic
+      window.reorder = (orderId) => {
+        const history = JSON.parse(localStorage.getItem("fd_order_history") || "[]");
+        const order = history.find(o => o.id === orderId);
+        if (!order || !order.cart) return alert("Order not found!");
+
+        const cart = JSON.parse(localStorage.getItem("fd_cart") || "[]");
+        order.cart.forEach(item => {
+            const idx = cart.findIndex(x => x.id === item.id);
+            if (idx >= 0) cart[idx].qty += item.qty;
+            else cart.push({ ...item });
+        });
+
+        localStorage.setItem("fd_cart", JSON.stringify(cart));
+        if (typeof toast === 'function') toast("Items added to cart! 🛒");
+        else alert("Order added to cart!");
+        
+        setTimeout(() => window.location.href = "cart.html", 800);
+      };
+
+      // Order Detail Modal Logic
+      const orderModal = document.getElementById("orderDetailModal");
+      const orderDetailContent = document.getElementById("orderDetailContent");
+      const closeOrderModal = document.getElementById("closeOrderModal");
+      const orderHistoryList = document.getElementById("orderHistoryList");
+
+      orderHistoryList.addEventListener("click", (e) => {
+        const card = e.target.closest(".order-card");
+        if (!card || e.target.closest(".btn-review")) return;
+
+        const orderId = card.dataset.orderId;
+        const history = JSON.parse(localStorage.getItem("fd_order_history") || "[]");
+        const order = history.find(o => o.id === orderId);
+
+        if (order) {
+          const subtotal = order.cart.reduce((sum, it) => sum + (it.qty * it.price), 0);
+          const total = subtotal - (order.discount || 0);
+          const review = JSON.parse(localStorage.getItem(`fd_order_review_${order.id}`) || "null");
+
+          orderDetailContent.innerHTML = `
+            <div style="text-align:center; padding-bottom:20px; border-bottom:1px dashed var(--line);">
+              <div style="font-size:24px; margin-bottom:5px;">🧾</div>
+              <h2 style="margin:0; font-size:18px;">Order Receipt</h2>
+              <p style="margin:5px 0 0; font-size:12px; color:var(--muted);">Order ID: #${order.id}</p>
+            </div>
+            
+            <div style="margin:20px 0;">
+              <h4 style="margin:0 0 10px; font-size:13px; text-transform:uppercase; color:var(--muted);">Items</h4>
+              ${order.cart.map(it => `
+                <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:14px;">
+                  <span>${it.qty}x ${it.name}</span>
+                  <b>₹${it.qty * it.price}</b>
+                </div>
+              `).join('')}
+            </div>
+
+            ${review ? `
+              <div style="background:rgba(22,163,74,0.05); padding:15px; border-radius:12px; margin-bottom:20px; border:1px solid rgba(22,163,74,0.1);">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                  <h4 style="margin:0; font-size:12px; text-transform:uppercase; color:#16a34a;">Your Review</h4>
+                  <div style="color:#ffb800; font-size:14px;">${"⭐".repeat(review.stars)}</div>
+                </div>
+                <p style="margin:0; font-size:13px; font-weight:1000; font-style:italic;">"${review.comment}"</p>
+              </div>
+            ` : ''}
+
+            <div style="background:rgba(0,0,0,.02); padding:15px; border-radius:12px; margin-bottom:20px;">
+              <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:14px;">
+                <span>Subtotal</span>
+                <span>₹${subtotal}</span>
+              </div>
+              <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:14px; color:#16a34a;">
+                <span>Discount</span>
+                <span>-₹${order.discount || 0}</span>
+              </div>
+              <div style="display:flex; justify-content:space-between; font-weight:1000; font-size:16px; border-top:1px solid var(--line); pt:8px; margin-top:8px;">
+                <span>Total Paid</span>
+                <span>₹${total}</span>
+              </div>
+            </div>
+
+            <div>
+              <h4 style="margin:0 0 10px; font-size:13px; text-transform:uppercase; color:var(--muted);">Delivery Address</h4>
+              <div style="font-size:13px; color:var(--text); line-height:1.6;">
+                <b>${order.address.name}</b><br/>
+                ${order.address.addr}, ${order.address.city} - ${order.address.pin}<br/>
+                Phone: ${order.address.phone}
+              </div>
+            </div>
+
+            <div style="margin-top:25px; display:flex; gap:10px;">
+              <button onclick="window.print()" class="pill" style="flex:1; background:var(--orange); color:white; border:none;">🖨️ Print</button>
+              <button id="closeOrderModalBtn" class="pill" style="flex:1;">Close</button>
+            </div>
+          `;
+          
+          orderModal.style.display = "flex";
+          document.getElementById("closeOrderModalBtn").onclick = () => orderModal.style.display = "none";
+        }
+      });
+
+      // Review Modal Logic
+      document.getElementById("reviewStarPicker").addEventListener("click", (e) => {
+        const star = e.target.closest(".star-item");
+        if (!star) return;
+        selectedOrderRating = parseInt(star.dataset.val);
+        const stars = document.querySelectorAll("#reviewStarPicker .star-item");
+        stars.forEach((s, i) => {
+          s.style.opacity = (i < selectedOrderRating) ? "1" : "0.3";
+          s.style.transform = (i < selectedOrderRating) ? "scale(1.2)" : "scale(1)";
+        });
+      });
+
+      document.getElementById("submitOrderReview").onclick = () => {
+        const comment = document.getElementById("reviewOrderText").value.trim();
+        if (selectedOrderRating === 0) return alert("Please select a rating!");
+        if (!comment) return alert("Please write a comment!");
+
+        const review = { stars: selectedOrderRating, comment, date: new Date().toISOString() };
+        localStorage.setItem(`fd_order_review_${activeReviewOrderId}`, JSON.stringify(review));
+        
+        reviewModal.style.display = "none";
+        // Reset
+        selectedOrderRating = 0;
+        document.getElementById("reviewOrderText").value = "";
+        document.querySelectorAll("#reviewStarPicker .star-item").forEach(s => { s.style.opacity = "0.3"; s.style.transform = "scale(1)"; });
+        
+        window.location.reload(); // Refresh to show "Rated" status
+      };
+
+      document.getElementById("closeReviewModal").onclick = () => reviewModal.style.display = "none";
+      document.getElementById("cancelOrderReview").onclick = () => reviewModal.style.display = "none";
+
+      closeOrderModal.onclick = () => orderModal.style.display = "none";
+      window.onclick = (e) => { 
+        if (e.target === orderModal) orderModal.style.display = "none"; 
+        if (e.target === addrModal) addrModal.style.display = "none";
+      };
+
+      // Referral Logic
+      const copyBtn = document.getElementById("copyReferBtn");
+      const referCode = document.getElementById("referCode");
+      const emailCode = (AUTH.getEmail().split('@')[0].toUpperCase() || "GUEST") + "FL100";
+      if(referCode) referCode.textContent = emailCode;
+
+      copyBtn?.addEventListener("click", () => {
+        navigator.clipboard.writeText(emailCode).then(() => {
+          const oldText = copyBtn.textContent;
+          copyBtn.textContent = "Copied! ✅";
+          copyBtn.style.background = "#16a34a";
+          setTimeout(() => {
+            copyBtn.textContent = oldText;
+            copyBtn.style.background = "var(--orange)";
+          }, 2000);
+        });
+      });
+
+      // Theme Toggle Logic
+      const themeToggle = document.getElementById("themeToggle");
+      themeToggle?.addEventListener("click", () => {
+        const next = window.toggleGlobalTheme();
+        if(themeToggle) themeToggle.textContent = next === "dark" ? "☀️ Light" : "🌙 Dark";
+      });
+      const currentTheme = localStorage.getItem("fd_theme") || "light";
+      if(themeToggle) themeToggle.textContent = currentTheme === "dark" ? "☀️ Light" : "🌙 Dark";
+
+      // Floating Icons Init
+      const foodEmojis = ['🍕', '🍔', '🍣', '🍱', '🥟', '🥘', '🥙', '🍰', '🍦'];
+      const container = document.getElementById('floatingIcons');
+      if (container) {
+        for (let i = 0; i < 15; i++) {
+          const el = document.createElement('div');
+          el.className = 'floating-food';
+          el.textContent = foodEmojis[Math.floor(Math.random() * foodEmojis.length)];
+          el.style.left = Math.random() * 100 + 'vw';
+          el.style.top = Math.random() * 100 + 'vh';
+          el.style.animationDelay = Math.random() * 5 + 's';
+          el.style.fontSize = (Math.random() * 20 + 20) + 'px';
+          container.appendChild(el);
+        }
+      }
+
+      // 3D Tilt Init
+      if (window.UI && window.UI.init3DTilt) {
+        window.UI.init3DTilt();
+      }
+    });
+  </script>
+
+  <!-- ORDER DETAIL MODAL -->
+  <div id="orderDetailModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.6); backdrop-filter:blur(5px); z-index:2000; align-items:center; justify-content:center; padding:20px;">
+    <div style="background:white; width:100%; max-width:400px; border-radius:24px; padding:25px; position:relative; box-shadow:0 20px 50px rgba(0,0,0,.2); animation: slideUp 0.3s ease-out;">
+      <button id="closeOrderModal" style="position:absolute; top:20px; right:20px; border:none; background:none; font-size:20px; cursor:pointer;">✕</button>
+      <div id="orderDetailContent"></div>
+    </div>
+  </div>
+
+  <!-- ORDER REVIEW MODAL -->
+  <div id="reviewModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.6); backdrop-filter:blur(5px); z-index:2001; align-items:center; justify-content:center; padding:20px;">
+    <div style="background:white; width:100%; max-width:400px; border-radius:24px; padding:25px; position:relative; box-shadow:0 20px 50px rgba(0,0,0,.2); animation: slideUp 0.3s ease-out;">
+      <button id="closeReviewModal" style="position:absolute; top:20px; right:20px; border:none; background:none; font-size:20px; cursor:pointer;">✕</button>
+      
+      <div style="text-align:center; padding-bottom:15px; border-bottom:1px solid rgba(0,0,0,0.05);">
+        <h2 id="reviewOrderTitle" style="margin:0; font-size:18px;">Rate Order</h2>
+        <p style="margin:5px 0 0; font-size:12px; color:var(--muted);">Tell us about your experience</p>
+      </div>
+
+      <div style="margin:20px 0; text-align:center;">
+        <div id="reviewStarPicker" style="display:flex; gap:12px; justify-content:center; font-size:32px; cursor:pointer;">
+          <span class="star-item" data-val="1" style="opacity:0.3; transition:0.2s;">⭐</span>
+          <span class="star-item" data-val="2" style="opacity:0.3; transition:0.2s;">⭐</span>
+          <span class="star-item" data-val="3" style="opacity:0.3; transition:0.2s;">⭐</span>
+          <span class="star-item" data-val="4" style="opacity:0.3; transition:0.2s;">⭐</span>
+          <span class="star-item" data-val="5" style="opacity:0.3; transition:0.2s;">⭐</span>
+        </div>
+      </div>
+
+      <textarea id="reviewOrderText" placeholder="How was the food and delivery?" style="width:100%; height:100px; border-radius:16px; border:1px solid rgba(0,0,0,0.1); padding:15px; font-family:inherit; font-size:14px; outline:none; resize:none; background:rgba(0,0,0,0.01);"></textarea>
+
+      <div style="margin-top:20px; display:flex; gap:10px;">
+        <button id="submitOrderReview" class="pill" style="flex:1; background:var(--orange); color:white; border:none; font-weight:1000;">Post Review</button>
+        <button id="cancelOrderReview" class="pill" style="flex:1; font-weight:1000;">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+        <!-- PREMIUM GOLD MEMBERSHIP -->
+        <div class="card premium-gold-card" style="margin-bottom:20px; border:2px solid #FFD700; background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), transparent);">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <div style="font-size:32px;">✨</div>
+                    <div>
+                        <h3 style="margin:0; font-weight:1000; color:#b8860b;">Premium Gold</h3>
+                        <p style="margin:4px 0 0; font-size:12px; font-weight:800; color:var(--muted);">Unlock exclusive gold aesthetics & perks</p>
+                    </div>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" id="goldToggle">
+                    <span class="slider round"></span>
+                </label>
+            </div>
+        </div>
+
+    <!-- TASTE DNA -->
+    <div class="card" style="margin-top:24px;">
+      <div class="cardHead">
+        <h3>Your Taste DNA 🧬</h3>
+        <span class="mini">Personalized Analysis</span>
+      </div>
+      <div id="tasteDnaContainer" style="margin-top:20px; display:grid; gap:16px;">
+        <div class="dna-row">
+            <div class="dna-label">🔥 Spicy & Bold</div>
+            <div class="dna-bar-bg"><div id="dnaSpicy" class="dna-bar" style="width:0; background:#ef4444;"></div></div>
+        </div>
+        <div class="dna-row">
+            <div class="dna-label">🍕 Comfort Food</div>
+            <div class="dna-bar-bg"><div id="dnaComfort" class="dna-bar" style="width:0; background:#f59e0b;"></div></div>
+        </div>
+        <div class="dna-row">
+            <div class="dna-label">🥗 Healthy & Fresh</div>
+            <div class="dna-bar-bg"><div id="dnaHealthy" class="dna-bar" style="width:0; background:#10b981;"></div></div>
+        </div>
+        <div class="dna-row">
+            <div class="dna-label">🍰 Sweet Tooth</div>
+            <div class="dna-bar-bg"><div id="dnaSweet" class="dna-bar" style="width:0; background:#ec4899;"></div></div>
+        </div>
+      </div>
+      <p style="font-size:12px; color:var(--muted); margin-top:16px; font-weight:700;">* Analysis based on your last 20 orders.</p>
+    </div>
+
+    <!-- ADDRESS MANAGER MODAL -->
+  <div id="addressModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.6); backdrop-filter:blur(5px); z-index:2002; align-items:center; justify-content:center; padding:20px;">
+    <div style="background:white; width:100%; max-width:450px; border-radius:24px; padding:25px; position:relative; box-shadow:0 20px 50px rgba(0,0,0,.2); animation: slideUp 0.3s ease-out; overflow-y:auto; max-height:90vh;">
+      <button id="closeAddrModal" style="position:absolute; top:20px; right:20px; border:none; background:none; font-size:20px; cursor:pointer;">✕</button>
+      
+      <div style="text-align:center; padding-bottom:15px; border-bottom:1px solid rgba(0,0,0,0.05);">
+        <h2 style="margin:0; font-size:18px;">Manage Addresses</h2>
+        <p style="margin:5px 0 0; font-size:12px; color:var(--muted);">Add or remove delivery locations</p>
+      </div>
+
+      <div id="addressManagerList" style="margin:20px 0; display:grid; gap:12px;">
+        <!-- Addresses for management here -->
+      </div>
+
+      <div style="background:rgba(0,0,0,0.02); padding:15px; border-radius:18px; margin-top:10px;">
+        <h4 style="margin:0 0 12px; font-size:13px; text-transform:uppercase; color:var(--muted);">Add New Address</h4>
+        <input id="newAddrName" placeholder="Recipient Name" style="width:100%; padding:10px; border-radius:10px; border:1px solid rgba(0,0,0,0.1); margin-bottom:8px; font-family:inherit; font-size:13px;">
+        <input id="newAddrPhone" placeholder="Phone Number" style="width:100%; padding:10px; border-radius:10px; border:1px solid rgba(0,0,0,0.1); margin-bottom:8px; font-family:inherit; font-size:13px;">
+        <textarea id="newAddrFull" placeholder="Flat/House No, Floor, Landmark" style="width:100%; height:60px; border-radius:10px; border:1px solid rgba(0,0,0,0.1); padding:10px; margin-bottom:8px; font-family:inherit; font-size:13px; resize:none;"></textarea>
+        <div style="display:flex; gap:8px; margin-bottom:12px;">
+          <input id="newAddrCity" placeholder="City" style="flex:1; padding:10px; border-radius:10px; border:1px solid rgba(0,0,0,0.1); font-family:inherit; font-size:13px;">
+          <input id="newAddrPin" placeholder="PIN" style="flex:1; padding:10px; border-radius:10px; border:1px solid rgba(0,0,0,0.1); font-family:inherit; font-size:13px;">
+        </div>
+        <select id="newAddrType" style="width:100%; padding:10px; border-radius:10px; border:1px solid rgba(0,0,0,0.1); margin-bottom:12px; font-family:inherit; font-size:13px; background:white;">
+          <option value="Home">🏠 Home</option>
+          <option value="Work">🏢 Work</option>
+          <option value="Other">📍 Other</option>
+        </select>
+        <button id="saveNewAddr" class="pill" style="width:100%; background:var(--orange); color:white; border:none; font-weight:1000;">Save Address</button>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    @keyframes slideUp {
+      from { transform: translateY(30px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    #orderDetailModal, #reviewModal, #addressModal { font-family: inherit; }
+    html.dark #orderDetailModal > div, html.dark #reviewModal > div, html.dark #addressModal > div { background: #1a1a1a; color: white; }
+    html.dark .order-status { color: #4ade80; }
+    html.dark .refer-card { background: linear-gradient(135deg,rgba(255,122,24,0.05),rgba(255,77,77,0.05)) !important; border-color: rgba(255,255,255,.1) !important; }
+    html.dark #referCode { background: #333 !important; color: white !important; border-color: #444 !important; }
+    html.dark .order-items { color: rgba(255,255,255,.6); }
+    html.dark #reviewOrderText, html.dark #addressModal input, html.dark #addressModal textarea, html.dark #addressModal select { 
+      background: rgba(255,255,255,0.03); 
+      color: white; 
+      border-color: rgba(255,255,255,0.1); 
+    }
+  </style>
+
+</body>
+</html>

@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Food Delivery • Home</title>
+
+  <link rel="stylesheet" href="./css/theme.css">
+  <link rel="stylesheet" href="./css/common.css">
+  <link rel="stylesheet" href="./css/home.css">
+  <script src="./js/theme.js"></script>
+    <script>
+      // Force update for item images (clear stale cart/favs)
+      (function() {
+        const VERSION = "1.2"; // increment this to force a reset
+        if (localStorage.getItem("app_version") !== VERSION) {
+          localStorage.removeItem("fd_cart");
+          localStorage.removeItem("fd_favs");
+          localStorage.setItem("app_version", VERSION);
+          console.log("App updated: Stale data cleared.");
+        }
+      })();
+    </script>
+</head>
+
+<body>
+  <div id="scrollProgress"></div>
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div id="bubbles" class="bubbles-container"></div>
+  <div id="particles" class="particles-container"></div>
+  <div id="cursorGlow" class="cursor-glow"></div>
+  <div class="scanner-line"></div>
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo">🍔</div>
+      <div>
+        <div class="brandTitle">Food Delivery</div>
+        <div class="brandSub">Fast • Fresh • Tasty</div>
+      </div>
+    </div>
+
+    <div class="navRight">
+      <button class="pill" id="themeToggle" type="button" onclick="window.toggleGlobalTheme(event)">🌙 Dark</button>
+      <button class="pill" id="notifBtn" type="button" style="position:relative; padding:0 12px; font-size:18px;">
+        🔔
+        <span class="notifBadge" style="display:none;">0</span>
+      </button>
+      <div id="goldBadge" class="pill" style="background:linear-gradient(135deg,#ffd700,#ffa500); color:#000; border:none; font-weight:1000; box-shadow:0 0 15px rgba(255,215,0,.3); cursor:pointer;">🏆 FD GOLD</div>
+      <div id="userBadge" class="pill">👤 Guest</div>
+
+      <a class="pill" href="index.html">🏠 Home</a>
+      <a class="pill" href="menu.html">🍽️ Menu</a>
+
+      <a class="pill cartPill" id="cartTarget" href="cart.html">
+        🛒 Cart
+        <span class="cartBadge cart-badge" id="cartCount">0</span>
+      </a>
+
+      <a class="btn btnGhost" id="loginBtn" href="login.html">Login</a>
+      <button class="btn btnDanger" id="logoutBtn" style="display:none;">Logout</button>
+    </div>
+  </header>
+
+  <!-- MAIN -->
+  <main class="container">
+    <section class="hero">
+      <div class="heroLeft">
+        <h1>Order food from top restaurants near you 🍕</h1>
+        <p class="small">Search, open restaurants, add items — premium UI ✅</p>
+
+        <div class="searchRow">
+          <input id="q" placeholder="Search restaurants (Pizza, Biryani, Andhra...)">
+          <button class="btn btnGhost" id="searchBtn">Search</button>
+          <button class="btn btnGhost" id="clearBtn">Clear</button>
+        </div>
+
+        <div class="chips" id="chips">
+          <button class="chip active" data-filter="all">✨ All</button>
+          <button class="chip" data-filter="biriyani">🍲 Biriyani</button>
+          <button class="chip" data-filter="nonveg">🍗 Non-Veg</button>
+          <button class="chip" data-filter="veg">🥗 Veg</button>
+          <button class="chip" data-filter="sweets">🍰 Sweets</button>
+          <button class="chip" data-cat="tiffins" type="button">🥞 Tiffins</button>
+          <button class="chip" data-cat="friedrice" type="button">🍛 Fried Rice</button>
+            
+            <select id="sortMenu" class="chip" style="outline:none; cursor:pointer; font-family:inherit;">
+              <option value="default">📶 Sort By (Default)</option>
+              <option value="rating">⭐ Rating: High to Low</option>
+              <option value="time">⏱️ Delivery Time: Fastest</option>
+            </select>
+          </div>
+        <div class="small" id="countText"></div>
+      </div>
+
+      <div class="heroRight">
+      </div>
+    </section>
+
+    <!-- SMART COLLECTIONS -->
+    <section class="collections-section" style="padding:40px 0 20px;">
+      <div class="section-head">
+        <h2 style="font-weight:1000; font-size:24px;">Trending Collections 🔥</h2>
+      </div>
+      <div class="scroller" id="collections" style="display:flex; gap:20px; overflow-x:auto; padding:10px 0; scrollbar-width:none;">
+        <div class="col-card" data-cat="biriyanis" style="flex:0 0 160px; height:200px; border-radius:24px; position:relative; overflow:hidden; cursor:pointer; background:linear-gradient(45deg,#2D3436,#000);">
+          <img src="https://images.unsplash.com/photo-1589302168068-964664d93dc0?w=300&h=400&fit=crop" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:0.6;">
+          <div style="position:absolute; bottom:15px; left:15px; color:white; font-weight:1000; font-size:16px; text-shadow:0 2px 10px rgba(0,0,0,0.5);">Biryani<br>Feast 🍲</div>
+        </div>
+        <div class="col-card" data-cat="veg" style="flex:0 0 160px; height:200px; border-radius:24px; position:relative; overflow:hidden; cursor:pointer; background:linear-gradient(45deg,#00b894,#000);">
+          <img src="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=300&h=400&fit=crop" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:0.6;">
+          <div style="position:absolute; bottom:15px; left:15px; color:white; font-weight:1000; font-size:16px; text-shadow:0 2px 10px rgba(0,0,0,0.5);">Healthy<br>Bites 🥗</div>
+        </div>
+        <div class="col-card" data-cat="pizzas" style="flex:0 0 160px; height:200px; border-radius:24px; position:relative; overflow:hidden; cursor:pointer; background:linear-gradient(45deg,#e17055,#000);">
+          <img src="https://images.unsplash.com/photo-1513104890138-7c749659a591?w=300&h=400&fit=crop" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:0.6;">
+          <div style="position:absolute; bottom:15px; left:15px; color:white; font-weight:1000; font-size:16px; text-shadow:0 2px 10px rgba(0,0,0,0.5);">Pizza<br>Party 🍕</div>
+        </div>
+        <div class="col-card" data-cat="sweets" style="flex:0 0 160px; height:200px; border-radius:24px; position:relative; overflow:hidden; cursor:pointer; background:linear-gradient(45deg,#fd79a8,#000);">
+          <img src="https://images.unsplash.com/photo-1551024601-bec78aea704b?w=300&h=400&fit=crop" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:0.6;">
+          <div style="position:absolute; bottom:15px; left:15px; color:white; font-weight:1000; font-size:16px; text-shadow:0 2px 10px rgba(0,0,0,0.5);">Sweet<br>Cravings 🧁</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- RECOMMENDED SECTION -->
+    <section id="recsSection" style="display:none; padding:20px 0 40px; border-bottom:1px solid rgba(0,0,0,0.05);">
+        <div class="section-head">
+            <h2 style="font-weight:1000; font-size:24px;">Recommended for You ✨</h2>
+        </div>
+        <div id="recsGrid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); gap:24px;"></div>
+    </section>
+
+    <!-- TRENDING DISHES SECTION -->
+    <section id="trendingItemsSection" style="padding:20px 0 40px; border-bottom:1px solid rgba(0,0,0,0.05);">
+        <div class="section-head">
+            <h2 style="font-weight:1000; font-size:24px;">Trending Dishes 🍕</h2>
+            <p class="small">Handpicked favorites for you</p>
+        </div>
+        <div id="trendingItemsGrid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(250px, 1fr)); gap:20px;"></div>
+    </section>
+
+    <h2 class="secTitle" style="margin-top:40px">Top Restaurants in Nellore</h2>
+    <p class="small">Pick a restaurant → open menu → add to cart</p>
+
+    <section id="restGrid" class="grid"></section>
+
+    <!-- LIVE ORDER TRACKING -->
+    <div id="liveOrderContainer" style="margin-top:40px; display:none;">
+      <div class="section-head">
+        <h2>Live Order Tracking 🛵</h2>
+      </div>
+      <div id="trackingCard" class="card" style="padding:24px; border-radius:24px; background:linear-gradient(135deg, #1e293b, #0f172a); color:white; border:none; position:relative; overflow:hidden;">
+        <!-- Injected via JS -->
+      </div>
+    </div>
+  </main>
+
+
+  <!-- AI FLOATING ASSISTANT -->
+  <div id="aiFab" style="position:fixed; bottom:30px; right:30px; z-index:100; cursor:pointer;">
+    <div style="background:var(--orange); width:60px; height:60px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:28px; box-shadow:0 8px 25px rgba(252,128,25,0.4); border:2px solid white; position:relative; overflow:hidden;">
+      🤖
+      <div style="position:absolute; inset:0; background:linear-gradient(45deg, transparent, rgba(255,255,255,0.3), transparent); animation: fabShine 3s infinite;"></div>
+    </div>
+    <div class="skeleton-pulse" style="position:absolute; inset:-4px; border-radius:50%; border:2px solid var(--orange); opacity:0.3; animation: pulseFAB 2s infinite;"></div>
+  </div>
+
+  <style>
+    @keyframes fabShine {
+      0% { transform: translateX(-100%) rotate(45deg); }
+      100% { transform: translateX(100%) rotate(45deg); }
+    }
+    @keyframes pulseFAB {
+      0% { transform: scale(1); opacity: 0.5; }
+      100% { transform: scale(1.4); opacity: 0; }
+    }
+    /* View Transition Styles */
+    ::view-transition-old(root),
+    ::view-transition-new(root) {
+      animation: none;
+      mix-blend-mode: normal;
+    }
+  </style>
+
+  <!-- SCRIPTS -->
+  <script src="./js/auth.js"></script>
+  <script src="./js/notifications.js"></script>
+  <script src="./js/data.js"></script>
+  <script src="./js/ui.js"></script>
+  <script src="./js/recs.js"></script>
+  <script src="./js/home.js"></script>
+
+
+</body>
+
+</html>
